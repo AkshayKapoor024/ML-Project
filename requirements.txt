@@ -1,0 +1,6 @@
+pandas 
+matplotlib
+seaborn 
+numpy
+-e .
+# Trigger setup.py file to install dependencies
