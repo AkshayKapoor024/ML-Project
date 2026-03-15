@@ -2,5 +2,8 @@ pandas
 matplotlib
 seaborn 
 numpy
--e .
+scikit-learn
+catboost
+xgboost
+# -e .
 # Trigger setup.py file to install dependencies

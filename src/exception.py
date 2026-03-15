@@ -1,6 +1,6 @@
 # Sys module helps us make changes in the python runtime enviroment and helps us get all the error details occured in the project
 import sys
-import logging
+from src.logger import logging
 # Creating a resuable function that fetches error details from the sys module and prints a custom error message 
 def error_message_details(error,error_detail:sys):
     # exc tb will contain all details regarding exception like type , file name , line number etc
@@ -11,7 +11,7 @@ def error_message_details(error,error_detail:sys):
    error_message = 'Error occured in python script name [{0}] line number [{1}] error message[{2}]'.format(file_name,exc_tb.tb_lineno,str(error))
    
    return error_message
-   
+
 # Creating custom error class 
 class CustomException(Exception):
     def __init__(self,error_message,error_detail:sys):
