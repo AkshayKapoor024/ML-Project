@@ -1,0 +1,55 @@
+name: CI/CD to EC2 using ECR
+
+on:
+push:
+branches:
+- main
+
+env:
+AWS_REGION: ${{ secrets.AWS_REGION }}
+ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+ECR_REGISTRY: ${{ secrets.AWS_ECR_LOGIN_URI }}
+IMAGE_TAG: latest
+
+jobs:
+deploy:
+runs-on: self-hosted
+
+```
+steps:
+
+  - name: Checkout code
+    uses: actions/checkout@v4
+
+  - name: Configure AWS Credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      aws-region: ${{ secrets.AWS_REGION }}
+
+  - name: Login to Amazon ECR
+    run: |
+      aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+  - name: Build Docker Image
+    run: |
+      docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+
+  - name: Push Image to ECR
+    run: |
+      docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  - name: Pull latest image on EC2
+    run: |
+      docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  - name: Stop old container
+    run: |
+      docker stop ml-container || true
+      docker rm ml-container || true
+
+  - name: Run new container
+    run: |
+      docker run -d -p 8080:8080 --name ml-container $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+```
