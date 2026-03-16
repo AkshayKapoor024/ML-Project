@@ -7,7 +7,6 @@ from sklearn.ensemble import AdaBoostRegressor,GradientBoostingRegressor,RandomF
 from sklearn.linear_model import LinearRegression,ElasticNet,Lasso,Ridge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
-from catboost import CatBoostRegressor
 from xgboost import XGBRegressor
 from sklearn.metrics import r2_score,root_mean_squared_error,mean_absolute_error
 
@@ -34,7 +33,6 @@ class ModelTrainer:
                 "Gradient Boosting": GradientBoostingRegressor(),
                 "Linear Regression": LinearRegression(),
                 "XGBRegressor": XGBRegressor(),
-                "CatBoosting Regressor": CatBoostRegressor(verbose=False),
                 "AdaBoost Regressor": AdaBoostRegressor(),
             }
             # Parameters for hyperparameter tuning models
@@ -62,11 +60,6 @@ class ModelTrainer:
                 "XGBRegressor":{
                     'learning_rate':[.1,.01,.05,.001],
                     'n_estimators': [8,16,32,64,128,256]
-                },
-                "CatBoosting Regressor":{
-                    'depth': [6,8,10],
-                    'learning_rate': [0.01, 0.05, 0.1],
-                    'iterations': [30, 50, 100]
                 },
                 "AdaBoost Regressor":{
                     'learning_rate':[.1,.01,0.5,.001],
