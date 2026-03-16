@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
 
 from src.components.data_transformation import DataTransformation,DataTransformationConfig
-
+from src.components.model_trainer import ModelTrainer,ModelTrainerConfig
 # Using dataclass decorator , we can use this to directly define variables in class which generally require a init constructor for defination
 # and then we can save the train and test data in a file to access in future
 @dataclass
@@ -56,8 +56,15 @@ class DataIngestion:
             raise CustomException(e,sys)
         
 if __name__ =='__main__':
+    # Creating Data ingestion Object
     obj = DataIngestion()
-    
+    # Reading Data from csv and Injecting train test data in .csv files
     train_data,test_data = obj.initiate_data_ingestion()
+    # Initiated Data transformation
     data_transformation = DataTransformation()
-    data_transformation.initiate_data_transformation(train_data,test_data)
+    # Performed Data transformation to get train and test Array
+    train_arr , test_arr , _ =data_transformation.initiate_data_transformation(train_data,test_data)
+    
+    modeltrainer=ModelTrainer()
+    print(modeltrainer.initiate_model_trainer(train_array=train_arr,test_array=test_arr))
+    
