@@ -6,6 +6,7 @@ import dill
 from src.exception import CustomException
 from src.logger import logging
 from sklearn.metrics import r2_score
+from sklearn.model_selection import GridSearchCV
 
 # Reusable save_object function used to save preprocessor or model file
 def save_object(file_path,obj):
@@ -20,7 +21,7 @@ def save_object(file_path,obj):
     except Exception as e:
         raise CustomException(e,sys)
 # Model Evaluation function used to evalute model reusable
-def evaluateModel(X_train,Y_train,X_test,Y_test,models):
+def evaluateModel(X_train,Y_train,X_test,Y_test,models,params):
     try:
         # Empty report defination
         report = {}
@@ -30,7 +31,14 @@ def evaluateModel(X_train,Y_train,X_test,Y_test,models):
             
             model = list(models.values())[i]
             
+            param = params[list(models.keys())[i]]
+            
             # Fitting Models
+            gs_cv = GridSearchCV(model,param,cv=3,n_jobs=-1,refit=True)
+            gs_cv.fit(X_train,Y_train)
+
+            # Setting best params for models
+            model.set_params(**gs_cv.best_params_)
             model.fit(X_train,Y_train)
             # Training Data Prediction
             Y_train_pred = model.predict(X_train)            
@@ -47,5 +55,13 @@ def evaluateModel(X_train,Y_train,X_test,Y_test,models):
         logging.info('Model Evaluation Completed')
         return report
         
+    except Exception as e:
+        raise CustomException(e,sys)
+    
+# Reusable function to load preprocessor and model    
+def loadObject(file_path):
+    try:
+        with open(file_path,'rb') as file_obj:
+            return dill.load(file_obj)
     except Exception as e:
         raise CustomException(e,sys)
