@@ -13,14 +13,15 @@ IMAGE_TAG: latest
 
 jobs:
 deploy:
+name: Deploy to EC2
 runs-on: self-hosted
 
 ```
 steps:
-  - name: Checkout code
+  - name: Checkout repository
     uses: actions/checkout@v4
 
-  - name: Configure AWS Credentials
+  - name: Configure AWS credentials
     uses: aws-actions/configure-aws-credentials@v1
     with:
       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -29,13 +30,14 @@ steps:
 
   - name: Login to Amazon ECR
     run: |
-      aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+      aws ecr get-login-password --region $AWS_REGION \
+      | docker login --username AWS --password-stdin $ECR_REGISTRY
 
   - name: Build Docker Image
     run: |
       docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
 
-  - name: Push Image to ECR
+  - name: Push Docker Image to ECR
     run: |
       docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
@@ -43,7 +45,7 @@ steps:
     run: |
       docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-  - name: Stop old container
+  - name: Stop and remove old container
     run: |
       docker stop ml-container || true
       docker rm ml-container || true
